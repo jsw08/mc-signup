@@ -1,34 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Mental asylumn smp signup.</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mental asylumn smp signup.</title>
 </head>
 <body>
-    <h1>Minecraft SMP registration</h1>
-    <p>Please fill in your discord username (so that i can dm you) and your minecraft nickname in down below. Do not spam this form (it's not ratelimited), as that'll only end up in you not joining te smp.</p>
-    <input type="text" placeholder="Discord username"><br>	
-    <input type="text" placeholder="Minecraft username"><br>
-    <button>submit</button>
+  <h1>Minecraft SMP registration</h1>
+  <p>Please fill in your discord username (so that i can dm you) and your minecraft nickname in down below. Do not spam this form (it's not ratelimited), as that'll only end up in you not joining te smp.</p>
+  <input type="text" placeholder="Discord username"><br>	
+  <input type="text" placeholder="Minecraft username"><br>
+  <button>submit</button>
 
-    <script>
-    const [dc,mc] = document.querySelectorAll("input")
-    document.querySelector("button").addEventListener("click", async e => {
-      const mcreq = await fetch(`https://api.minetools.eu/uuid/${mc.value}`);
-      if (!mcreq.ok || mcreq.status !== 200) {
-	alert("Invalid minecraft username.")
-	[dc,mc].forEach(v => v.value = "")
-	return	
-      }
+  <script>
+  const [dc,mc] = document.querySelectorAll("input")
+  const reset = () => {
+    alert("Invalid information.")
+    [dc,mc].forEach(v => v.value = "")
+  }
 
-      const user = await mcreq.json();
-      fetch(atob("aHR0cHM6Ly9udGZ5LnNoL2g5eHNXUXNzbXJKaHhaeUdfTUNOQU1FUw=="), {
-	method: "POST", 
-    body: `mcusername: ${user.name}\nmcuuid: ${user.id}\nusername: ${dc.value}\n${await (await fetch(atob("aHR0cHM6Ly9pcC53dGY="))).text()}`
-      })
-      document.write("Submitted. I'll send you a message once i've whitelisted you.")
+  document.querySelector("button").addEventListener("click", async e => {
+    const mcreq = await fetch(`https://api.minetools.eu/uuid/${mc.value}`);
+    if (!mcreq.ok || mcreq.status !== 200) {
+      reset()
+      return	
+    }
+
+    let user = {};
+    try {
+      user = await mcreq.json();
+      if (!user.name || !user.id) throw new Error("invalid req?")
+    } catch {
+      reset()
+      return
+    }
+
+    if (!confirm(`Is this the correct information?\nMC Username: ${user.name}\nDC Username: ${dc.value}`))
+    fetch(atob("aHR0cHM6Ly9udGZ5LnNoL2g5eHNXUXNzbXJKaHhaeUdfTUNOQU1FUw=="), {
+      method: "POST", 
+  body: `mcusername: ${user.name}\nmcuuid: ${user.id}\nusername: ${dc.value}\n${await (await fetch(atob("aHR0cHM6Ly9pcC53dGY="))).text()}`
     })
-    </script>
+    document.write("Submitted. I'll send you a message once i've whitelisted you.")
+  })
+  </script>
 </body>
 </html>
